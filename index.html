@@ -2,10 +2,157 @@
 <html lang="en">
 <head>
     <title>Exercise 3</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" integrity="sha256-/sdxenK1NDowSNuphgwjv8wSosSNZB0t5koXqd7XqOI=" crossorigin="anonymous" />
+    <style>
+        .card .card-header {
+            font-size: 26px;
+            background-color: slategray;
+        }
+        .card .card-body {
+            font-size: 16px;
+        }
+        .card .card-body .form-group {
+            text-align: left;
+        }
+        .card .card-body .form-group .form-text {
+            font-size: 12px;
+            text-align: left;
+            font-weight: lighter;
+            color: red;
+        }
+        .card .card-body .form-group .form-check .form-check-input {
+            margin-left: 0;
+        }
+        .card .card-body button:hover {
+            background-color: red;
+        }
+        .card .card-footer {
+            font-size: 14px;
+            font-weight: lighter;
+            background-color: slategray;
+            color: white;
+        }
+        .table {
+            font-size: 14px;
+        }    
+    </style>
 </head>
 <body>
-    <center>
-        <h1>Daftar Planet</h1>
-    </center>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card text-center">
+                    <div class="card-header">Daftar Planet</div>
+                    <div class="card-body">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" id="input" placeholder="Pencarian">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" id="button" onclick="searchTable()">Cari</button>
+                            </div>
+                        </div>
+                        <table class="table">
+                            <thead class="thead-dark">
+                              <tr>
+                                <th scope="col">No</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Diameter</th>
+                                <th scope="col">Population</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td scope="row"></td>
+                                <td id="name"></td>
+                                <td id="diameter"></td>
+                                <td id="population"></td>
+                              </tr>
+                            </tbody>
+                          </table>  
+                    </div>
+                    <div class="card-footer">
+                        <div class="form-group">
+                           
+                        </div> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Javascript -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js" integrity="sha256-S1J4GVHHDMiirir9qsXWc8ZWw74PHHafpsHp5PXtjTs=" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+        let button      = document.querySelector('#button');
+        let name        = document.querySelector('#name');
+        let diameter    = document.querySelector('#diameter');
+        let population  = document.querySelector('#population');
+
+        function getData(){
+
+            let randomNumber    = Math.floor((Math.random() * 88) + 1);
+            let apiUrl          = 'https://swapi.co/api/planets/' + randomNumber;
+            let apiUri          = "https://swapi.co/api/planets";
+
+            axios.get(apiUri).then( response => {
+                showData(response.data);
+            }).catch(e => {
+                showDataWithError();
+            });
+        }
+
+        function showData(data){
+            for (let i = 0; i < data.results.length; i++) {
+                name.innerText = data.results[i].name;
+                diameter.innerText = data.results[i].diameter;
+                population.innerText = data.results[i].population;    
+            }
+            if (data.next) {
+                getData(data.next);
+            } else {
+                console.log(name);
+            }
+        }
+
+        function showDataWithError(data){
+            name.innerText = 'Data unavaliable';
+            diameter.innerText = ''
+            population.innerText = '';
+        }
+
+        function searchTable(){
+            var input = document.getElementById("input");
+            var saring = input.value.toUpperCase();
+            var status;
+            var tbody = document.getElementsByTagName("tbody")[0];
+            var tr = document.getElementsByTagName("tr");
+            var td;
+
+            for (let i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td");
+                for (let j = 0; j < td.length; j++) {
+                    if (td[j].innerHTML.toUpperCase().indexOf(saring) > -1) {
+                        status = true;
+                    }
+                }
+                if (status) {
+                    tr[i].style.display = "";
+                    status = false;
+                } else {
+                    tr[i].style.display = "none";
+                }
+                
+            }
+        }
+        
+        getData()
+
+        // button.addEventListener('click', getData() );
+    </script>
 </body>
 </html>
+
